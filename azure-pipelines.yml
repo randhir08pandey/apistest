@@ -1,0 +1,29 @@
+# azure-pipelines.yml
+
+trigger:
+  branches:
+    include:
+      - main  # Adjust branch name as per your main branch
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: UseJavaVersion@1
+    inputs:
+      versionSpec: '14'  # Adjust Java version as needed
+      architecture: 'x64'
+
+  - script: |
+      ./mvnw clean install -B
+    displayName: 'Build Spring Boot application'
+
+  - script: |
+      ./mvnw test -B
+    displayName: 'Run tests'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/target'
+      artifactName: 'spring-boot-app'
+      publishLocation: 'Container'
