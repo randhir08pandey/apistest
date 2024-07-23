@@ -11,7 +11,7 @@ pool:
 steps:
   - task: UseJavaVersion@1
     inputs:
-      versionSpec: '14'  # Adjust Java version as needed
+      versionSpec: '17'  # Adjust Java version as needed
       architecture: 'x64'
 
   - script: |
