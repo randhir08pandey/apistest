@@ -4,10 +4,7 @@ trigger:
       - main  # Adjust branch name as per your main branch
 
 pool:
-  vmImage: 'ubuntu-latest'
-  pool:
-    name: MySelfHostedAgents
-
+  name: MySelfHostedAgents  # Specify the name of your self-hosted agent pool
 
 steps:
   - task: UseJavaVersion@0
