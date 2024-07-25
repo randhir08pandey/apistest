@@ -1,34 +1,55 @@
+# Java and Spring Boot CI/CD Pipeline
+# Build and test Java and Spring Boot projects.
+# Add steps that publish build artifacts, and more:
+# https://learn.microsoft.com/azure/devops/pipelines/languages/java
+
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
 trigger:
+  batch: true
   branches:
     include:
       - main
+      - develop
 
 pool:
-  name:mycomputeragent
+  vmImage: 'mycomputeragent'
+
+variables:
+  mavenVersion: '3.x'
+  javaVersion: '11'
+  mavenOptions: '-Xmx3072m'
+  buildConfiguration: 'Release'
+  artifactName: 'SpringBootApp'
+  artifactPath: '$(Build.ArtifactStagingDirectory)/$(artifactName).jar'
 
 steps:
-  - task: Cache@2
+  - task: UseJavaVersion@1
     inputs:
-      key: 'maven | "$(Agent.OS)" | pom.xml'
-      path: '$(System.DefaultWorkingDirectory)/.m2/repository'
-      cacheHitVar: 'CACHE_HIT'
-    displayName: 'Cache Maven dependencies'
+      versionSpec: '$(javaVersion)'
+      jdkArchitecture: 'x64'
 
-  - task: UseJavaVersion@0
+  - task: Maven@3
     inputs:
-      versionSpec: '17'
-      architecture: 'x64'
-
-  - script: |
-      ./mvnw clean install -B
-    displayName: 'Build Spring Boot application'
-
-  - script: |
-      ./mvnw test -B
-    displayName: 'Run tests'
+      mavenPomFile: '**/pom.xml'
+      options: '$(mavenOptions)'
+      goals: 'package'
+      mavenVersionOption: 'Default'
+      jdkVersion: '$(javaVersion)'
+      publishJUnitResults: true
+      testResultsFiles: '**/target/test-classes/testng-results.xml'
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: '$(System.DefaultWorkingDirectory)/target'
-      artifactName: 'spring-boot-app'
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
       publishLocation: 'Container'
+
+  - task: Maven@3
+    inputs:
+      mavenPomFile: '**/pom.xml'
+      goals: 'verify'
+      mavenVersionOption: 'Default'
+      jdkVersion: '$(javaVersion)'
+
+# Optional: If you want to deploy the application, add deployment steps here
