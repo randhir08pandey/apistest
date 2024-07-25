@@ -4,7 +4,7 @@ trigger:
       - main
 
 pool:
-  name: MySelfHostedAgents
+  name:mycomputeragent
 
 steps:
   - task: Cache@2
@@ -12,7 +12,7 @@ steps:
       key: 'maven | "$(Agent.OS)" | pom.xml'
       path: '$(System.DefaultWorkingDirectory)/.m2/repository'
       cacheHitVar: 'CACHE_HIT'
-      displayName: 'Cache Maven dependencies'
+    displayName: 'Cache Maven dependencies'
 
   - task: UseJavaVersion@0
     inputs:
@@ -27,7 +27,7 @@ steps:
       ./mvnw test -B
     displayName: 'Run tests'
 
-  - task: PublishBuildArtifacts@0
+  - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: '$(System.DefaultWorkingDirectory)/target'
       artifactName: 'spring-boot-app'
